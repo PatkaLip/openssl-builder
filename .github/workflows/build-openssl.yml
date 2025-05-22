@@ -7,39 +7,24 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: centos:8  # lub rockylinux:9, almalinux:9, itp.
 
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
       - name: Install build dependencies
-        run: sudo apt update && sudo apt install -y build-essential perl wget
-
-      - name: Build and install OpenSSL
         run: |
-          set -eux  # włącz tryb debugowania
-      
+          yum -y install gcc make perl wget tar
+
+      - name: Download and build OpenSSL
+        run: |
           wget https://www.openssl.org/source/openssl-3.1.2.tar.gz
           tar -xzf openssl-3.1.2.tar.gz
           cd openssl-3.1.2
-      
-          ./Configure linux-x86_64 --prefix=$GITHUB_WORKSPACE/openssl-output
-      
-          echo "🧱 === MAKE ==="
+          ./Configure linux-x86_64 --prefix=/tmp/openssl-out
           make -j$(nproc)
-      
-          echo "🛠 === MAKE INSTALL ==="
           make install
-      
-          echo "📂 === INSTALL OUTPUT ==="
-          find $GITHUB_WORKSPACE/openssl-output -type f
+          tar -czf /tmp/openssl-3.1.2-x86_64.tar.gz -C /tmp/openssl-out .
 
-
-
-
-      - name: Archive built OpenSSL
-        run: |
-          tar -czf openssl-3.1.2-x86_64.tar.gz -C openssl-output .
 
       - name: Upload archive
         uses: ./.github/actions/upload-artifact
