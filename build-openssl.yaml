@@ -1,0 +1,34 @@
+name: Build OpenSSL 3.1.2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: sudo apt update && sudo apt install -y build-essential perl wget
+
+      - name: Download and build OpenSSL
+        run: |
+          wget https://www.openssl.org/source/openssl-3.1.2.tar.gz
+          tar -xzf openssl-3.1.2.tar.gz
+          cd openssl-3.1.2
+          ./Configure linux-x86_64 --prefix=$PWD/openssl-install
+          make -j$(nproc)
+          make install
+
+      - name: Package result
+        run: |
+          tar -czf openssl-3.1.2-x86_64.tar.gz -C openssl-install .
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: openssl-3.1.2-x86_64
+          path: openssl-3.1.2-x86_64.tar.gz
