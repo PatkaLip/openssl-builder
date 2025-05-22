@@ -35,6 +35,5 @@ jobs:
           git config --global user.email "actions@github.com"
           git add openssl-3.1.2-x86_64.tar.gz
           git commit -m "Add OpenSSL 3.1.2 archive"
-          git push origin main
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git push https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }} HEAD:main
+
