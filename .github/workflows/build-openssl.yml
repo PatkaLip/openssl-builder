@@ -30,7 +30,7 @@ jobs:
           tar -czf openssl-3.1.2-x86_64.tar.gz -C openssl-output .
 
       - name: Upload archive as artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v2
         with:
           name: openssl-3.1.2-x86_64
           path: openssl-3.1.2-x86_64.tar.gz
