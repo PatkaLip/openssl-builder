@@ -15,24 +15,25 @@ jobs:
       - name: Install build dependencies
         run: sudo apt update && sudo apt install -y build-essential perl wget
 
-      - name: Download and build OpenSSL
+      - name: Build and install OpenSSL
         run: |
+          set -eux  # włącz tryb debugowania
+      
           wget https://www.openssl.org/source/openssl-3.1.2.tar.gz
           tar -xzf openssl-3.1.2.tar.gz
-      
-          mkdir -p openssl-output
-      
           cd openssl-3.1.2
+      
           ./Configure linux-x86_64 --prefix=$GITHUB_WORKSPACE/openssl-output
       
-          echo "🔧 Buduję OpenSSL..."
+          echo "🧱 === MAKE ==="
           make -j$(nproc)
       
-          echo "🛠 Instaluję OpenSSL..."
+          echo "🛠 === MAKE INSTALL ==="
           make install
       
-          echo "📦 Zawartość openssl-output:"
-          ls -R $GITHUB_WORKSPACE/openssl-output
+          echo "📂 === INSTALL OUTPUT ==="
+          find $GITHUB_WORKSPACE/openssl-output -type f
+
 
 
 
