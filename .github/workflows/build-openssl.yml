@@ -36,4 +36,6 @@ jobs:
           git add openssl-3.1.2-x86_64.tar.gz
           git commit -m "Add OpenSSL 3.1.2 archive"
           git push https://x-access-token:${{ secrets.token }}@github.com/${{ github.repository }} HEAD:main
+        env:
+          token: ${{ secrets.token }}
 
