@@ -29,14 +29,19 @@ jobs:
         run: |
           tar -czf openssl-3.1.2-x86_64.tar.gz -C openssl-output .
 
-      - name: Commit built archive to repo
+      - name: Upload archive via GitHub API
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "actions@github.com"
-          git remote set-url origin https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }}
-          git add openssl-3.1.2-x86_64.tar.gz
-          git commit -m "Add OpenSSL 3.1.2 archive"
-          git push https://x-access-token:${{ secrets.GH_PAT }}@github.com/${{ github.repository }} HEAD:main
+          REPO="${{ github.repository }}"
+          FILE="openssl-3.1.2-x86_64.tar.gz"
+          BRANCH="main"
+          MESSAGE="Add OpenSSL 3.1.2 archive"
+          ENCODED=$(base64 -w 0 $FILE)
+          curl -X PUT \
+            -H "Authorization: token $GH_PAT" \
+            -H "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/$REPO/contents/$FILE \
+            -d "{\"message\":\"$MESSAGE\",\"content\":\"$ENCODED\",\"branch\":\"$BRANCH\"}"
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
+
 
