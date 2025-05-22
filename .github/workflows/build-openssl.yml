@@ -29,13 +29,11 @@ jobs:
         run: |
           tar -czf openssl-3.1.2-x86_64.tar.gz -C openssl-output .
 
-      - name: Upload archive as artifact
-        uses: actions/upload-artifact@v2
+      - name: Upload archive
+        uses: ./.github/actions/upload-artifact
         with:
           name: openssl-3.1.2-x86_64
           path: openssl-3.1.2-x86_64.tar.gz
 
-        env:
-          GH_PAT: ${{ secrets.GH_PAT }}
 
 
