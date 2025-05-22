@@ -1,4 +1,4 @@
-name: Build OpenSSL 3.1.2
+name: Build OpenSSL 3.1.2 (commit to repo)
 
 on:
   push:
@@ -15,24 +15,26 @@ jobs:
       - name: Install build dependencies
         run: sudo apt update && sudo apt install -y build-essential perl wget
 
-      - name: Download and extract OpenSSL
+      - name: Download and build OpenSSL
         run: |
           wget https://www.openssl.org/source/openssl-3.1.2.tar.gz
           tar -xzf openssl-3.1.2.tar.gz
-
-      - name: Build and install OpenSSL
-        run: |
+          mkdir openssl-output
           cd openssl-3.1.2
-          ./Configure linux-x86_64 --prefix=$GITHUB_WORKSPACE/openssl-install
+          ./Configure linux-x86_64 --prefix=$GITHUB_WORKSPACE/openssl-output
           make -j$(nproc)
           make install
 
-      - name: Create .tar.gz archive
+      - name: Archive built OpenSSL
         run: |
-          tar -czf openssl-3.1.2-x86_64.tar.gz -C openssl-install .
+          tar -czf openssl-3.1.2-x86_64.tar.gz -C openssl-output .
 
-      - name: Upload OpenSSL artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: openssl-3.1.2-x86_64
-          path: openssl-3.1.2-x86_64.tar.gz
+      - name: Commit built archive to repo
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+          git add openssl-3.1.2-x86_64.tar.gz
+          git commit -m "Add OpenSSL 3.1.2 archive"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
