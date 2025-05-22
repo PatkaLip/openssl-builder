@@ -29,18 +29,12 @@ jobs:
         run: |
           tar -czf openssl-3.1.2-x86_64.tar.gz -C openssl-output .
 
-      - name: Upload archive via GitHub API
-        run: |
-          REPO="${{ github.repository }}"
-          FILE="openssl-3.1.2-x86_64.tar.gz"
-          BRANCH="main"
-          MESSAGE="Add OpenSSL 3.1.2 archive"
-          ENCODED=$(base64 -w 0 $FILE)
-          curl -X PUT \
-            -H "Authorization: token $GH_PAT" \
-            -H "Accept: application/vnd.github+json" \
-            https://api.github.com/repos/$REPO/contents/$FILE \
-            -d "{\"message\":\"$MESSAGE\",\"content\":\"$ENCODED\",\"branch\":\"$BRANCH\"}"
+      - name: Upload archive as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: openssl-3.1.2-x86_64
+          path: openssl-3.1.2-x86_64.tar.gz
+
         env:
           GH_PAT: ${{ secrets.GH_PAT }}
 
