@@ -1,4 +1,4 @@
-name: Build OpenSSL 3.1.2
+name: Build OpenSSL 3.1.2 (self-hosted)
 
 on:
   push:
@@ -6,13 +6,16 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
       - name: Install dependencies
-        run: sudo apt update && sudo apt install -y build-essential perl wget
+        run: |
+          if ! command -v make &> /dev/null; then echo "❌ make not found"; exit 1; fi
+          if ! command -v gcc &> /dev/null; then echo "❌ gcc not found"; exit 1; fi
+          if ! command -v perl &> /dev/null; then echo "❌ perl not found"; exit 1; fi
 
       - name: Download and build OpenSSL
         run: |
@@ -23,13 +26,7 @@ jobs:
           make -j$(nproc)
           make install
 
-      - name: Package result
+      - name: Copy tar.gz to repo
         run: |
           tar -czf openssl-3.1.2-x86_64.tar.gz -C openssl-install .
-
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: openssl-3.1.2-x86_64
-          path: openssl-3.1.2-x86_64.tar.gz
-
+          cp openssl-3.1.2-x86_64.tar.gz $GITHUB_WORKSPACE/
