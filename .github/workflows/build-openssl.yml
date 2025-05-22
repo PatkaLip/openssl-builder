@@ -19,14 +19,21 @@ jobs:
         run: |
           wget https://www.openssl.org/source/openssl-3.1.2.tar.gz
           tar -xzf openssl-3.1.2.tar.gz
-          mkdir -p "$GITHUB_WORKSPACE/openssl-output"
+      
+          mkdir -p openssl-output
+      
           cd openssl-3.1.2
-          ./Configure linux-x86_64 --prefix="$GITHUB_WORKSPACE/openssl-output"
+          ./Configure linux-x86_64 --prefix=$GITHUB_WORKSPACE/openssl-output
+      
+          echo "🔧 Buduję OpenSSL..."
           make -j$(nproc)
+      
+          echo "🛠 Instaluję OpenSSL..."
           make install
+      
+          echo "📦 Zawartość openssl-output:"
+          ls -R $GITHUB_WORKSPACE/openssl-output
 
-          echo "Zawartość openssl-output:"
-          ls -R "$GITHUB_WORKSPACE/openssl-output"
 
 
       - name: Archive built OpenSSL
